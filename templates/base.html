@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %} - AverageReads</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> 
+    <title>AverageReads</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://kit.fontawesome.com/b8b10726aa.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('add') }}">Add Book</a>
-
-    </nav>
+    <header>
+        <h1> Average Reads </h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>|
+            <a href="{{ url_for('add') }}"> Add</a>|
+            <a href="/download">Download All Books</a>
+        </nav>
+    </header>
     <hr>
     <div class="content">
         {% block content %} {% endblock %}

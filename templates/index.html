@@ -1,22 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="title">{% block title %} Books {% endblock %}</h1>
-    <div class="content">
-    {% for book in books %}
-    <div class="student">
-        <p><b>#{{ book.id }}</b></p>
-        <b>
-            <p class="name">{{book.book_title}} -- {{book.list_choice}}</p>
-        </b>
-        <a href="{{ url_for('edit', book_id=book.id) }}">Edit</a>
-        <hr>
-        <form method="POST"
-                action="{{ url_for('delete', book_id=book.id) }}">
-            <input type="submit" value="Delete Book"
-                onclick="return confirm('Are you sure you want to delete this entry?')">
+
+        <div class="to-read">
+            <h3>To Read</h3>
+            {% for x in toread %}
+          <div> {{x.title}} <a class="edit-link" title="Edit Book" href="{{ url_for('edit',id=x.id) }}"><i class="fa-solid fa-pen-to-square"></i></a>
+            <form method="POST"
+            action="{{ url_for('delete', id=x.id) }}" class="delete">
+                <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete {{x.title}}?')"><i class="fa-regular fa-trash-can"></i></button>
         </form>
-    </div>
-{% endfor %}
-    </div>
-{% endblock %}
+            </div>
+            {%endfor%}
+        </div>
+
+        <div class="reading">
+            <h3>Reading</h3>
+
+            {% for a in reading %}
+            <div>{{a.title}} <a class="edit-link" title="Edit Book" href="{{ url_for('edit',id=a.id) }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                <form method="POST"
+                action="{{ url_for('delete', id=a.id) }}" class="delete">
+                    <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete {{a.title}}?')"><i class="fa-regular fa-trash-can"></i></button>
+                </form>
+            </div>
+            {%endfor%}
+        </div>
+
+        <div class="read">
+                <h3>Read</h3>
+                {% for y in read %}
+                <div>{{y.title}} <a class="edit-link" title="Edit Book" href="{{ url_for('edit',id=y.id) }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                    <form method="POST" class="delete" action="{{ url_for('delete', id=y.id) }} " >
+                        <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete {{y.title}}?')"><i class="fa-regular fa-trash-can"></i></button>
+                    </form>
+                </div>
+            {%endfor%}
+        </div>
+
+        <hr>
+
+
+
+    {% endblock %}

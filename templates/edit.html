@@ -1,28 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 style="width: 100%">
-        {% block title %} Edit {{ book.book_title}} Details
-        {% endblock %}
-    </h1>
-    <form method="post">
+        <form class="edit-book" method="POST">
+           <h3>
 
-        <p>
-            <label for="book_title">Book Title</label>
-            <input type="text" name="book_title" value="{{book.book_title}}"
-                   placeholder="Book title">
-            </input>
-        </p>
+            {% block title %} Edit Details {% endblock %}
+           </h3>
+           <br>
+            <label for="edit-book">Book Title:
+            <input type="text" value="{{book.title}}" name="title">
+                <br>
+                Current Book List: <strong>{{book.list_choice}} </strong>
+                <hr>
+            <label for="list_choice">Confirm or update list choice:</label>
+            <br>
 
+            <select name="list_choice">
+                    <option value="To Read">To Read</option>
+                   <option value="Reading">Reading</option>
+                   <option value="Read">Read</option>
+            </select>
+            <input type="submit" value="Save">
+        </form>
 
-        <label for="lists">Choose a list:</label>
-        <select name="lists">
-            <option value="none">---</option>
-            <option value="to-read">To Read</option>
-            <option value="reading">Reading</option>
-            <option value="read">Read</option>
-        </select>
-
-            <button type="submit">Submit</button>
-    </form>
-{% endblock %}
+      </div>
+      {% endblock %}

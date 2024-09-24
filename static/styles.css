@@ -1,3 +1,57 @@
 * {
-    background-color: lightgray;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #fff6ec;
+}
+
+header {
+    text-align: center;
+}
+
+nav a {
+    color: black;
+    text-decoration: none;
+    margin-right: 3px;
+    font-weight:600;
+}
+
+nav a:hover {
+    border-bottom: 4px solid #ACB1FF;
+}
+
+
+.add-book, .edit-book {
+    margin: 40px auto;
+    text-align: center;
+}
+.add-book select {
+    margin-top:20px;
+}
+
+.edit-link {
+    color: navy;
+    padding: 0 25px;
+}
+
+.to-read, .reading, .read {
+    vertical-align: top;
+    width: 30%;
+    display:inline-block;
+}
+
+.to-read div, .reading div, .read div {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.delete {
+    display: inline;
+}
+.delete-button {
+    border: none;
+    font-size: 18px;
+    background-color: #fff6ec;
+    color: red;
 }

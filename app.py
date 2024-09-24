@@ -1,66 +1,109 @@
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, flash, send_file, send_from_directory, Response
+import csv
+
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from itertools import zip_longest
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///books.db'
-
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+
+app.secret_key = 'SECRET_KEY'
 
 class Book(db.Model):
-    id= db.Column(db.Integer, primary_key = True)
-    book_title = db.Column(db.String(250), nullable=False)
-    list_choice = db.Column(db.String(20))
+    id = db.Column(db.Integer,primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    list_choice = db.Column(db.String(25), nullable=False)
 
     def __repr__(self):
-        return f'Book: {self.book_title}, added to {self.list_choice}>'
+        return f"{self.title}, {self.list_choice}"
 
-@app.route('/')
+@app.route("/", methods=['GET', 'POST'])
 def index():
     books = Book.query.all()
-    return render_template('index.html', books=books)
+    toread = Book.query.filter(Book.list_choice == "To Read").all()
+    reading = Book.query.filter(Book.list_choice == "Reading").all()
+    read = Book.query.filter(Book.list_choice == "Read").all()
 
-@app.route('/add/', methods=('GET','POST'))
-def add():
-    if request.method == 'POST':
-        book_title = request.form['book_title']
-        list_choice = request.form['list_choice']
+    return render_template('index.html', books=books, toread=toread,reading=reading, read=read)
 
-        book = Book(book_title=book_title,list_choice=list_choice)
-        db.session.add(book)
-        db.session.commit()
 
+@app.route("/download", methods=['GET', 'POST'])
+def download():
+    toread = Book.query.filter(Book.list_choice == "To Read").all()
+    reading = Book.query.filter(Book.list_choice == "Reading").all()
+    read = Book.query.filter(Book.list_choice == "Read").all()
+
+    toreadlist = []
+    readinglist = []
+    readlist = []
+
+    for book in toread:
+        toreadlist.append(book.title)
+    for book in reading:
+        readinglist.append(book.title)
+    for book in read:
+        readlist.append(book.title)
+
+    path = './static/'
+
+    if (len(toreadlist) == 0 and len(readinglist) == 0 and len(readlist) == 0):
+        flash('No lists to download, add some books!')
         return redirect(url_for('index'))
-    return render_template('add.html')
+
+    else:
+        with open(path + 'all-books.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['To Read', 'Reading', 'Read'])
+            writer.writerows(zip_longest(toreadlist, readinglist, readlist))
+
+        return send_from_directory('./static', 'all-books.csv', as_attachment=True)
 
 
-@app.route('/<int:book_id>/edit/', methods=('GET', 'POST'))
-def edit(book_id):
-    book = Book.query.get_or_404(book_id)
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    if request.form:
+        book = Book(title=request.form.get("title").title(), list_choice =request.form.get("list_choice"))
+        titlecheck = book.query.filter_by(title=book.title).first()
 
-    if request.method == 'POST':
-        book_title = request.form['book_title']
-        list_choice = request.form['list_choice']
+        if titlecheck:
+            flash('Book already exists on a shelf')
+        else:
+            db.session.add(book)
+            db.session.commit()
+            return redirect(url_for('index'))
 
-        book.book_title = book_title
+    books = Book.query.all()
+
+    return render_template('add.html', books=books)
+
+@app.route('/edit/<int:id>/', methods=['GET','POST'])
+def edit(id):
+    book = Book.query.get_or_404(id)
+
+    if request.method == "POST":
+        title = request.form.get('title').title()
+        list_choice = request.form.get('list_choice')
+
+        book.title = title
         book.list_choice = list_choice
 
         db.session.add(book)
         db.session.commit()
-
         return redirect(url_for('index'))
 
     return render_template('edit.html', book=book)
 
-@app.post('/<int:book_id>/delete/')
-def delete(book_id):
-    book = Book.query.get_or_404(book_id)
+@app.post('/delete/<int:id>/')
+def delete(id):
+    book = Book.query.get_or_404(id)
     db.session.delete(book)
     db.session.commit()
     return redirect(url_for('index'))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(debug=True)
