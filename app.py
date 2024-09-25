@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_file, send_from_directory, Response
 import csv
 import os
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 from flask_sqlalchemy import SQLAlchemy
 from itertools import zip_longest
