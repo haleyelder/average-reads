@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_file, send_from_directory, Response
 import csv
+import os
 
 from flask_sqlalchemy import SQLAlchemy
 from itertools import zip_longest
@@ -12,6 +13,13 @@ db = SQLAlchemy(app)
 
 app.secret_key = 'SECRET_KEY'
 
+class Config(object):
+    if os.getenv('DATABASE_URL'):
+        SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL').replace("postgres://", "postgresql://", 1)
+    else:
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASEDIR, 'instance', 'books.db')}"
+
+
 class Book(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -19,6 +27,14 @@ class Book(db.Model):
 
     def __repr__(self):
         return f"{self.title}, {self.list_choice}"
+
+
+@app.cli.command('init_db')
+def initialize_database():
+    """Initialize the database."""
+    db.drop_all()
+    db.create_all()
+    echo('Initialized the database!')
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
